@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Plugin-Id: nf-schema-builder
-Plugin-Version: 0.6.0
+Plugin-Version: 0.0.1
 Plugin-Class: nextflow.schema.SchemaBuilderPlugin
 Plugin-Provider: nextflow
 Plugin-Requires: >=24.11.0-edge
