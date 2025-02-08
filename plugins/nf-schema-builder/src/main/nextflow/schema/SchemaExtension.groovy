@@ -1,5 +1,4 @@
-package nextflow.hello
-
+package nextflow.schema
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,15 +14,13 @@ import nextflow.plugin.extension.Operator
 import nextflow.plugin.extension.PluginExtensionPoint
 
 /**
- * Example plugin extension showing how to implement a basic
- * channel factory method, a channel operator and a custom function.
+ * Plugin extension for schema building functionality
  *
  * @author : jorge <jorge.aguilera@seqera.io>
- *
  */
 @Slf4j
 @CompileStatic
-class HelloExtension extends PluginExtensionPoint {
+class SchemaExtension extends PluginExtensionPoint {
 
     /*
      * A session hold information about current execution of the script
@@ -31,18 +28,18 @@ class HelloExtension extends PluginExtensionPoint {
     private Session session
 
     /*
-     * A Custom config extracted from nextflow.config under hello tag
+     * A Custom config extracted from nextflow.config under schema tag
      * nextflow.config
      * ---------------
      * docker{
      *   enabled = true
      * }
      * ...
-     * hello{
+     * schema{
      *    prefix = 'Mrs'
      * }
      */
-     private HelloConfig config
+     private SchemaConfig config
 
     /*
      * nf-core initializes the plugin once loaded and session is ready
@@ -51,11 +48,11 @@ class HelloExtension extends PluginExtensionPoint {
     @Override
     protected void init(Session session) {
         this.session = session
-        this.config = new HelloConfig(session.config.navigate('hello') as Map)
+        this.config = new SchemaConfig(session.config.navigate('schema') as Map)
     }
 
     /*
-     * {@code reverse} is a `producer` method and will be available to the script because:
+     * {@code generateSchema} is a `producer` method and will be available to the script because:
      *
      * - it's public
      * - it returns a DataflowWriteChannel
@@ -65,19 +62,25 @@ class HelloExtension extends PluginExtensionPoint {
      *
      */
     @Factory
-    DataflowWriteChannel reverse(String message) {
+    DataflowWriteChannel generateSchema(Map processConfig) {
         final channel = CH.create()
-        session.addIgniter((action) -> reverseImpl(channel, message))
+        session.addIgniter((action) -> generateSchemaImpl(channel, processConfig))
         return channel
     }
 
-    private void reverseImpl(DataflowWriteChannel channel, String message) {
-        channel.bind(message.reverse());
+    private void generateSchemaImpl(DataflowWriteChannel channel, Map processConfig) {
+        // TODO: Implement schema generation logic
+        def schema = [
+            '$schema': 'https://json-schema.org/draft/2020-12/schema',
+            type: 'object',
+            properties: processConfig
+        ]
+        channel.bind(schema)
         channel.bind(Channel.STOP)
     }
 
     /*
-    * {@code goodbye} is a *consumer* method as it receives values from a channel to perform some logic.
+    * {@code validateSchema} is a *consumer* method as it receives values from a channel to perform some logic.
     *
     * Consumer methods are introspected by nextflow-core and include into the DSL if the method:
     *
@@ -90,12 +93,15 @@ class HelloExtension extends PluginExtensionPoint {
     * - a closure to consume items (one by one)
     * - a finalizer closure
     *
-    * in this case `goodbye` will consume a message and will store it as an upper case
+    * in this case `validateSchema` will consume a message and will store it as an upper case
     */
     @Operator
-    DataflowWriteChannel goodbye(DataflowReadChannel source) {
+    DataflowWriteChannel validateSchema(DataflowReadChannel source) {
         final target = CH.createBy(source)
-        final next = { target.bind("Goodbye $it".toString()) }
+        final next = { 
+            // TODO: Implement schema validation logic
+            target.bind("Schema validation passed for: $it".toString()) 
+        }
         final done = { target.bind(Channel.STOP) }
         DataflowHelper.subscribeImpl(source, [onNext: next, onComplete: done])
         return target
@@ -107,8 +113,9 @@ class HelloExtension extends PluginExtensionPoint {
      * Using @Function annotation we allow this function can be imported from the pipeline script
      */
     @Function
-    String randomString(int length=9){
-        new Random().with {(1..length).collect {(('a'..'z')).join(null)[ nextInt((('a'..'z')).join(null).length())]}.join(null)}
+    Map parseSchema(String schemaFile) {
+        // TODO: Implement schema parsing logic
+        return [:]
     }
 
 }

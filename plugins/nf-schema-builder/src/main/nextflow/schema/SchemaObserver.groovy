@@ -14,38 +14,29 @@
  * limitations under the License.
  */
 
-package nextflow.hello
+package nextflow.schema
 
 import groovy.transform.CompileStatic
-import nextflow.plugin.BasePlugin
-import nextflow.cli.PluginAbstractExec
-import org.pf4j.PluginWrapper
+import groovy.util.logging.Slf4j
+import nextflow.Session
+import nextflow.trace.TraceObserver
 
 /**
- * Implements the Hello plugins entry point
+ * Schema workflow events observer
  *
  * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
  */
+@Slf4j
 @CompileStatic
-class HelloPlugin extends BasePlugin implements PluginAbstractExec {
-    HelloPlugin(PluginWrapper wrapper) {
-        super(wrapper)
+class SchemaObserver implements TraceObserver {
+
+    @Override
+    void onFlowCreate(Session session) {
+        log.info "Schema Builder plugin initialized 📋"
     }
 
     @Override
-    List<String> getCommands() {
-        [ 'hello' ]
-    }
-
-    @Override
-    int exec(String cmd, List<String> args) {
-        if( cmd == 'hello' ) {
-            println "Hello! You gave me these arguments: ${args.join(' ')}"
-            return 0
-        }
-        else {
-            System.err.println "Invalid command: ${cmd}"
-            return 1
-        }
+    void onFlowComplete() {
+        log.info "Schema generation complete ✅"
     }
 }

@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package nextflow.hello
+package nextflow.schema
 
 import groovy.transform.CompileStatic
 import nextflow.Session
 import nextflow.trace.TraceObserver
 import nextflow.trace.TraceObserverFactory
 /**
- * Implements the validation observer factory
+ * Implements the schema observer factory
  *
  * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
  */
 @CompileStatic
-class HelloFactory implements TraceObserverFactory {
+class SchemaFactory implements TraceObserverFactory {
 
     @Override
     Collection<TraceObserver> create(Session session) {
         final result = new ArrayList()
-        result.add( new HelloObserver() )
+        result.add(new SchemaObserver())
         return result
     }
 }
