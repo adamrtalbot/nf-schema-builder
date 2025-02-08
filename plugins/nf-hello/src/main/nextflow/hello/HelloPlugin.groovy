@@ -18,7 +18,7 @@ package nextflow.hello
 
 import groovy.transform.CompileStatic
 import nextflow.plugin.BasePlugin
-import nextflow.plugin.Scoped
+import nextflow.cli.PluginAbstractExec
 import org.pf4j.PluginWrapper
 
 /**
@@ -27,9 +27,25 @@ import org.pf4j.PluginWrapper
  * @author Paolo Di Tommaso <paolo.ditommaso@gmail.com>
  */
 @CompileStatic
-class HelloPlugin extends BasePlugin {
-
+class HelloPlugin extends BasePlugin implements PluginAbstractExec {
     HelloPlugin(PluginWrapper wrapper) {
         super(wrapper)
+    }
+
+    @Override
+    List<String> getCommands() {
+        [ 'hello' ]
+    }
+
+    @Override
+    int exec(String cmd, List<String> args) {
+        if( cmd == 'hello' ) {
+            println "Hello! You gave me these arguments: ${args.join(' ')}"
+            return 0
+        }
+        else {
+            System.err.println "Invalid command: ${cmd}"
+            return 1
+        }
     }
 }

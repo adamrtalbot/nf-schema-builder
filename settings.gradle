@@ -24,3 +24,4 @@ plugins {
 rootProject.name = 'nf-hello'
 include('plugins')
 include('plugins:nf-hello')
+includeBuild('../nextflow')
